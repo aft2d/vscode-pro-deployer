@@ -22,6 +22,7 @@ PRO Deployer - Simple and powerful SFTP/FTP deployer. Support **concurrency** up
 - upload all open files
 - upload all uncommitted files
 - support workspaces! Now you can have multiple Pro Deployer configurations for each workspace. The first workspace folder is used for default configuration for UI/UX settings. All other settings will be used according to the active workspace. When use `pro-deployer.upload-all-open` or `pro-deployer.download-all-files` will be uploaded/downloaded files from the selected target workspace.
+- upload to specific target via keybinding
 
 ## Donation
 
@@ -37,6 +38,23 @@ If you like this extension, you could become a backer or sponsor via **[PayPal](
 
 1. `Alt+U` - upload file
 2. `Alt+D` - download file
+
+## Upload to Specific Target via Keybinding
+
+You can bind a specific target to a keyboard shortcut by passing the `target` argument to the `pro-deployer.upload-to` command in your `keybindings.json`.
+
+```json
+{
+    "key": "ctrl+alt+1",
+    "command": "pro-deployer.upload-to",
+    "args": { "target": "My SFTP" }
+},
+{
+    "key": "ctrl+alt+2",
+    "command": "pro-deployer.upload-to",
+    "args": { "target": "My FTP" }
+}
+```
 
 ## Example Configs
 

@@ -4,6 +4,10 @@ All notable changes to the "pro-deployer" extension will be documented in this f
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [3.2.0]
+
+- added support for passing arguments to `pro-deployer.upload-to` command. Now you can bind specific targets to keyboard shortcuts.
+
 ## [3.1.1]
 
 - fixed bug: Issue #43 - If file unsaved, downloading file does nothing

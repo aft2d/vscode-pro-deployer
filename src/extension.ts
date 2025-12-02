@@ -380,6 +380,8 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand("pro-deployer.upload-to", (...args) => {
             const URIs = [] as vscode.Uri[];
+            let targetName: string | undefined;
+
             args.forEach((arg) => {
                 if (arg instanceof vscode.Uri) {
                     const checkExist = URIs.find((item) => {
@@ -409,6 +411,9 @@ export function activate(context: vscode.ExtensionContext) {
                         }
                     });
                 }
+                if (typeof arg === "object" && arg !== null && "target" in arg && typeof arg.target === "string") {
+                    targetName = arg.target;
+                }
             });
             if (URIs.length === 0 && vscode.window.activeTextEditor?.document.uri) {
                 URIs.push(vscode.window.activeTextEditor?.document.uri);
@@ -418,27 +423,7 @@ export function activate(context: vscode.ExtensionContext) {
                 return;
             }
 
-            const items = Targets.getItems()
-                .filter((item) => {
-                    if (Extension.getActiveWorkspaceFolder()?.uri.path !== item.getWorkspaceFolder().uri.path) {
-                        return false;
-                    }
-                    return true;
-                })
-                .map((item) => {
-                    return {
-                        label: item.getName(),
-                        description: item.getWorkspaceFolder().name,
-                        target: item,
-                    };
-                });
-            vscode.window.showQuickPick(items).then((value) => {
-                if (!value) {
-                    return;
-                }
-
-                const target = value.target;
-
+            const performUpload = (target: any) => {
                 target.connect(() => {
                     URIs.forEach((uri) => {
                         Extension.isLikeFile(uri).then((isFile) => {
@@ -458,6 +443,39 @@ export function activate(context: vscode.ExtensionContext) {
                         });
                     });
                 });
+            };
+
+            const availableTargets = Targets.getItems().filter((item) => {
+                if (Extension.getActiveWorkspaceFolder()?.uri.path !== item.getWorkspaceFolder().uri.path) {
+                    return false;
+                }
+                return true;
+            });
+
+            if (targetName) {
+                const target = availableTargets.find((t) => t.getName() === targetName);
+                if (target) {
+                    performUpload(target);
+                    return;
+                } else {
+                    Extension.showErrorMessage(`Target '${targetName}' not found in active workspace.`);
+                    return;
+                }
+            }
+
+            const items = availableTargets.map((item) => {
+                return {
+                    label: item.getName(),
+                    description: item.getWorkspaceFolder().name,
+                    target: item,
+                };
+            });
+            vscode.window.showQuickPick(items).then((value) => {
+                if (!value) {
+                    return;
+                }
+
+                performUpload(value.target);
             });
         })
     );
