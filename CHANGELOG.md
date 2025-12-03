@@ -4,6 +4,12 @@ All notable changes to the "pro-deployer" extension will be documented in this f
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [3.2.1]
+
+- fixed bug: `baseDir` option was not properly applied when downloading all files, causing files to be saved to incorrect local paths.
+- fixed bug: ignore/include patterns now properly match dotfiles (e.g., `.env`, `.gitignore`).
+- fixed bug: ignored files are now properly skipped when using the `pro-deployer.upload-all-uncommitted` command.
+
 ## [3.2.0]
 
 - added support for passing arguments to `pro-deployer.upload-to` command. Now you can bind specific targets to keyboard shortcuts.

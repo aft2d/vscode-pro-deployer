@@ -96,12 +96,12 @@ export class Extension {
             Extension.appendLineToOutputChannel("File ignored (config file)");
             return true;
         }
-        if (micromatch.isMatch(relativePath, Configs.getWorkspaceConfigs(uri).ignore)) {
+        if (micromatch.isMatch(relativePath, Configs.getWorkspaceConfigs(uri).ignore, { dot: true })) {
             Extension.appendLineToOutputChannel("File/folder ignored (ignore option): " + relativePath);
             return true;
         }
         if (Configs.getWorkspaceConfigs(uri).include.length > 0) {
-            if (micromatch.isMatch(relativePath, Configs.getWorkspaceConfigs(uri).include) === false) {
+            if (micromatch.isMatch(relativePath, Configs.getWorkspaceConfigs(uri).include, { dot: true }) === false) {
                 Extension.appendLineToOutputChannel("File/folder not included (include option): " + relativePath);
                 return true;
             }
@@ -637,6 +637,9 @@ export function activate(context: vscode.ExtensionContext) {
 
                 target.connect(() => {
                     URIs.forEach((uri) => {
+                        if (Extension.isUriIgnored(uri)) {
+                            return;
+                        }
                         if (
                             target.getWorkspaceFolder().uri.path !== vscode.workspace.getWorkspaceFolder(uri)?.uri.path
                         ) {

@@ -300,6 +300,15 @@ export class FTP extends Target implements TargetInterface {
             relativePath = "";
         }
 
+        // Get baseDir for constructing local paths
+        let baseDir = this.options.baseDir ?? "";
+        if (baseDir.startsWith("/")) {
+            baseDir = baseDir.substring(1);
+        }
+        if (baseDir.length > 0 && !baseDir.endsWith("/")) {
+            baseDir = baseDir + "/";
+        }
+
         return new Promise<vscode.Uri>((resolve, reject) => {
             if (!this.isConnected) {
                 reject("Not connected");
@@ -323,7 +332,12 @@ export class FTP extends Target implements TargetInterface {
 
                             list.forEach((item) => {
                                 const file = vscode.Uri.file(
-                                    Extension.getActiveWorkspaceFolder()?.uri.path + "/" + dir + "/" + item.name
+                                    Extension.getActiveWorkspaceFolder()?.uri.path +
+                                        "/" +
+                                        baseDir +
+                                        dir +
+                                        "/" +
+                                        item.name
                                 );
 
                                 if (item.type === "-") {
