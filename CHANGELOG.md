@@ -4,6 +4,16 @@ All notable changes to the "pro-deployer" extension will be documented in this f
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [3.3.0]
+
+- added support for dynamic configuration variables in config values:
+  - `${workspaceFolder}` - the path of the workspace folder
+  - `${workspaceFolderBasename}` - the name of the workspace folder without path
+  - `${userHome}` - the path of the user's home folder
+  - `${pathSeparator}` - the character used to separate path components
+  - `${env:VARIABLE_NAME}` - the value of an environment variable
+- This allows creating reusable configurations across different workspaces (e.g., `"dir": "/var/www/${workspaceFolderBasename}"`)
+
 ## [3.2.1]
 
 - fixed bug: `baseDir` option was not properly applied when downloading all files, causing files to be saved to incorrect local paths.

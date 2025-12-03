@@ -23,6 +23,7 @@ PRO Deployer - Simple and powerful SFTP/FTP deployer. Support **concurrency** up
 - upload all uncommitted files
 - support workspaces! Now you can have multiple Pro Deployer configurations for each workspace. The first workspace folder is used for default configuration for UI/UX settings. All other settings will be used according to the active workspace. When use `pro-deployer.upload-all-open` or `pro-deployer.download-all-files` will be uploaded/downloaded files from the selected target workspace.
 - upload to specific target via keybinding
+- **dynamic configuration variables** - use `${workspaceFolderBasename}`, `${workspaceFolder}`, `${userHome}`, `${env:VAR}` in configuration values
 
 ## Donation
 
@@ -59,6 +60,41 @@ You can bind a specific target to a keyboard shortcut by passing the `target` ar
 ## Example Configs
 
 Config file location: `${workspaceFolder}/.vscode/pro-deployer.json`
+
+### Variable Substitution
+
+PRO Deployer supports VS Code-like variables in configuration values. This is useful for creating dynamic configurations that adapt to different workspaces.
+
+**Supported Variables:**
+
+| Variable | Description |
+|----------|-------------|
+| `${workspaceFolder}` | The path of the workspace folder |
+| `${workspaceFolderBasename}` | The name of the workspace folder without path |
+| `${userHome}` | The path of the user's home folder |
+| `${pathSeparator}` | The character used to separate path components |
+| `${env:VARIABLE_NAME}` | The value of an environment variable |
+
+**Example with dynamic directory:**
+
+```js
+{
+    "targets": [
+        {
+            "name": "My SFTP",
+            "type": "sftp",
+            "host": "example.com",
+            "user": "admin",
+            "password": "123456",
+            "dir": "/var/www/${workspaceFolderBasename}"  // Uses workspace folder name
+        }
+    ]
+}
+```
+
+This allows you to use the same configuration template across multiple workspaces, and the `dir` will automatically resolve to the workspace folder name (e.g., `/var/www/my-project`).
+
+### Full Configuration Example
 
 ```js
 {

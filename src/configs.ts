@@ -2,6 +2,7 @@ import { TextEncoder } from "util";
 import * as vscode from "vscode";
 import { Extension } from "./extension";
 import { ConfigsInterface, TargetOptionsInterface } from "./targets/Interfaces";
+import { VariableResolver } from "./VariableResolver";
 
 export class Configs {
     public static readonly sampleConfig: ConfigsInterface = {
@@ -159,10 +160,17 @@ export class Configs {
                     return;
                 }
 
-                const configs = Object.assign({}, this.defaultConfigs, fileConfigs, workspaceConfigs);
+                let configs = Object.assign({}, this.defaultConfigs, fileConfigs, workspaceConfigs);
                 if (fileConfigs.ignore) {
                     configs.ignore = fileConfigs.ignore;
                 }
+
+                // Resolve variables in target configurations
+                const workspaceFolder = vscode.workspace.getWorkspaceFolder(file);
+                if (workspaceFolder && configs) {
+                    configs = VariableResolver.resolveObject(configs, workspaceFolder);
+                }
+
                 if (index === 0) {
                     this.configs = configs;
                 }
@@ -196,6 +204,13 @@ export class Configs {
                 if (fileConfigs.ignore) {
                     this.configs.ignore = fileConfigs.ignore;
                 }
+
+                // Resolve variables in target configurations
+                const workspaceFolder = vscode.workspace.getWorkspaceFolder(e.uri);
+                if (workspaceFolder && this.configs) {
+                    this.configs = VariableResolver.resolveObject(this.configs, workspaceFolder);
+                }
+
                 Extension.appendLineToOutputChannel(
                     "[INFO] The config file is updated: " + JSON.stringify(this.configs)
                 );
@@ -225,10 +240,17 @@ export class Configs {
                             return;
                         }
 
-                        const configs = Object.assign({}, this.defaultConfigs, fileConfigs, workspaceConfigs);
+                        let configs = Object.assign({}, this.defaultConfigs, fileConfigs, workspaceConfigs);
                         if (fileConfigs.ignore) {
                             configs.ignore = fileConfigs.ignore;
                         }
+
+                        // Resolve variables in target configurations
+                        const workspaceFolder = vscode.workspace.getWorkspaceFolder(file);
+                        if (workspaceFolder && configs) {
+                            configs = VariableResolver.resolveObject(configs, workspaceFolder);
+                        }
+
                         if (index === 0) {
                             this.configs = configs;
                         }

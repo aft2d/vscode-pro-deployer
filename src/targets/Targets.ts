@@ -24,7 +24,8 @@ export class Targets {
             if (Extension.getActiveWorkspaceFolder()?.uri.path !== target.getWorkspaceFolder().uri.path) {
                 return false;
             }
-            let isActive = Configs.getWorkspaceConfigs().activeTargets?.indexOf(target.getName()) !== -1;
+            const activeTargets = Configs.getWorkspaceConfigs().activeTargets ?? [];
+            const isActive = activeTargets.indexOf(target.getName()) !== -1;
             return isActive;
         });
     }
