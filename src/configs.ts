@@ -37,6 +37,7 @@ export class Configs {
                 dir: "/",
                 baseDir: "/",
                 transferDataType: "binary",
+                secure: false,
             },
         ] as TargetOptionsInterface[],
     };

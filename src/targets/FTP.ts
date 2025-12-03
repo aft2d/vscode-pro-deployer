@@ -105,7 +105,15 @@ export class FTP extends Target implements TargetInterface {
         if (!this.options.transferDataType) {
             this.options.transferDataType = "binary";
         }
-        Extension.appendLineToOutputChannel("INFO][FTP] Connecting to: " + this.options.host + ":" + this.options.port);
+        Extension.appendLineToOutputChannel(
+            "[INFO][FTP] Connecting to: " + this.options.host + ":" + this.options.port
+        );
+        if (this.options.secure) {
+            Extension.appendLineToOutputChannel(
+                "[INFO][FTP] Using secure connection (FTPS): " +
+                    (this.options.secure === "implicit" ? "implicit" : "explicit")
+            );
+        }
         this.client.connect({
             host: this.options.host,
             port: this.options.port,
@@ -116,7 +124,7 @@ export class FTP extends Target implements TargetInterface {
             //     console.log("debug", message);
             // },
             secureOptions: {
-                rejectUnauthorized: false,
+                rejectUnauthorized: this.options.secureOptions?.rejectUnauthorized ?? false,
             },
         });
     }

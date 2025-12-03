@@ -16,6 +16,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - logs server banner messages
 - added keyboard-interactive authentication support for SFTP connections (`tryKeyboard: true`)
 - improved error messages for SFTP connection failures
+- added FTPS (FTP over SSL/TLS) support for FTP connections:
+  - `secure: true` - enables explicit FTPS (AUTH TLS)
+  - `secure: "implicit"` - enables implicit FTPS (typically port 990)
+  - `secureOptions.rejectUnauthorized` - controls certificate validation (defaults to false)
 
 ## [3.2.0]
 

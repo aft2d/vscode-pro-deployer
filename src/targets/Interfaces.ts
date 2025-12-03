@@ -22,7 +22,10 @@ export interface TargetOptionsInterface {
     port?: number;
     user?: string;
     password?: string;
-    secure?: boolean;
+    secure?: boolean | "implicit";
+    secureOptions?: {
+        rejectUnauthorized?: boolean;
+    };
     privateKey?: string;
     passphrase?: string;
     transferDataType?: "binary" | "ascii";

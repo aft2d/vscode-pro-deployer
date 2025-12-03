@@ -98,12 +98,47 @@ Config file location: `${workspaceFolder}/.vscode/pro-deployer.json`
             "password": "123456",
             "dir": "/public_html",
             "baseDir": "/", //This option is useful when you want to upload files from a subdirectory of the project
-            "transferDataType": "binary"
+            "transferDataType": "binary",
+            "secure": false, //Set to true for explicit FTPS (AUTH TLS) or "implicit" for implicit FTPS (port 990)
+            "secureOptions": {
+                "rejectUnauthorized": false //Set to true to reject unauthorized certificates
+            }
         }
     ]
 }
 
 ```
+
+## FTP Target Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `name` | string | - | Name of the target (required) |
+| `type` | string | - | Must be `"ftp"` (required) |
+| `host` | string | - | FTP server hostname (required) |
+| `port` | number | `21` | FTP server port |
+| `user` | string | - | FTP username |
+| `password` | string | - | FTP password |
+| `dir` | string | - | Remote directory path (required) |
+| `baseDir` | string | `"/"` | Local base directory for uploads |
+| `transferDataType` | string | `"binary"` | Transfer mode: `"binary"` or `"ascii"` |
+| `secure` | boolean \| string | `false` | `true` for explicit FTPS (AUTH TLS), `"implicit"` for implicit FTPS |
+| `secureOptions.rejectUnauthorized` | boolean | `false` | Whether to reject unauthorized SSL certificates |
+
+## SFTP Target Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `name` | string | - | Name of the target (required) |
+| `type` | string | - | Must be `"sftp"` (required) |
+| `host` | string | - | SFTP server hostname (required) |
+| `port` | number | `22` | SFTP server port |
+| `user` | string | - | SFTP username |
+| `password` | string | - | SFTP password |
+| `dir` | string | - | Remote directory path (required) |
+| `baseDir` | string | `"/"` | Local base directory for uploads |
+| `privateKey` | string | `null` | Path to private key file for key-based authentication |
+| `passphrase` | string | `null` | Passphrase for encrypted private key |
 
 ## Extension Commands
 
