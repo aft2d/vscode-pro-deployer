@@ -203,7 +203,7 @@
         "gitignore-parser": "^0.0.2",
         "micromatch": "^4.0.8",
         "path": "^0.12.7",
-        "ssh2": "^1.16.0"
+        "ssh2": "^1.17.0"
     },
     "devDependencies": {
         "@types/ftp": "^0.3.36",

@@ -9,6 +9,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - fixed bug: `baseDir` option was not properly applied when downloading all files, causing files to be saved to incorrect local paths.
 - fixed bug: ignore/include patterns now properly match dotfiles (e.g., `.env`, `.gitignore`).
 - fixed bug: ignored files are now properly skipped when using the `pro-deployer.upload-all-uncommitted` command.
+- improved SFTP authentication debugging with detailed logging:
+  - logs private key format detection (OpenSSH new format, PEM/RSA, PEM/DSA, PEM/ECDSA, PKCS8)
+  - logs authentication configuration summary (username, password/key/passphrase provided)
+  - logs SSH handshake details (key exchange algorithm, server host key, ciphers)
+  - logs server banner messages
+- added keyboard-interactive authentication support for SFTP connections (`tryKeyboard: true`)
+- improved error messages for SFTP connection failures
 
 ## [3.2.0]
 

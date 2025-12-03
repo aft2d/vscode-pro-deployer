@@ -88,6 +88,39 @@ export class SFTP extends Target implements TargetInterface {
             this.emit("error", error);
         });
 
+        // Handle keyboard-interactive authentication
+        this.client.on("keyboard-interactive", (name, instructions, instructionsLang, prompts, finish) => {
+            Extension.appendLineToOutputChannel("[INFO][SFTP] Server requested keyboard-interactive authentication");
+            if (name) {
+                Extension.appendLineToOutputChannel("[INFO][SFTP] Keyboard-interactive name: " + name);
+            }
+            if (instructions) {
+                Extension.appendLineToOutputChannel("[INFO][SFTP] Keyboard-interactive instructions: " + instructions);
+            }
+            Extension.appendLineToOutputChannel("[INFO][SFTP] Keyboard-interactive prompts count: " + prompts.length);
+            prompts.forEach((prompt, index) => {
+                Extension.appendLineToOutputChannel(
+                    "[INFO][SFTP] Prompt " + index + ": " + prompt.prompt + " (echo: " + prompt.echo + ")"
+                );
+            });
+
+            // Respond to prompts - typically password prompts
+            const responses: string[] = prompts.map((prompt) => {
+                // Check if this is a password prompt
+                if (prompt.prompt.toLowerCase().includes("password") && this.options.password) {
+                    Extension.appendLineToOutputChannel("[INFO][SFTP] Responding to password prompt");
+                    return this.options.password;
+                }
+                // For other prompts, return empty string
+                Extension.appendLineToOutputChannel(
+                    "[WARN][SFTP] Unknown prompt, sending empty response: " + prompt.prompt
+                );
+                return "";
+            });
+
+            finish(responses);
+        });
+
         if (!this.options.port) {
             this.options.port = 22;
         }
@@ -98,11 +131,46 @@ export class SFTP extends Target implements TargetInterface {
         let privateKey = undefined;
         try {
             privateKey = this.options.privateKey ? require("fs").readFileSync(this.options.privateKey) : undefined;
-        } catch (err) {
+            if (privateKey) {
+                Extension.appendLineToOutputChannel("[INFO][SFTP] Private key loaded from: " + this.options.privateKey);
+                Extension.appendLineToOutputChannel("[INFO][SFTP] Private key size: " + privateKey.length + " bytes");
+                // Check key format
+                const keyStr = privateKey.toString();
+                if (keyStr.includes("OPENSSH PRIVATE KEY")) {
+                    Extension.appendLineToOutputChannel("[INFO][SFTP] Private key format: OpenSSH (new format)");
+                } else if (keyStr.includes("RSA PRIVATE KEY")) {
+                    Extension.appendLineToOutputChannel("[INFO][SFTP] Private key format: PEM (RSA)");
+                } else if (keyStr.includes("DSA PRIVATE KEY")) {
+                    Extension.appendLineToOutputChannel("[INFO][SFTP] Private key format: PEM (DSA)");
+                } else if (keyStr.includes("EC PRIVATE KEY")) {
+                    Extension.appendLineToOutputChannel("[INFO][SFTP] Private key format: PEM (ECDSA)");
+                } else if (keyStr.includes("PRIVATE KEY")) {
+                    Extension.appendLineToOutputChannel("[INFO][SFTP] Private key format: PEM (PKCS8)");
+                } else {
+                    Extension.appendLineToOutputChannel("[WARN][SFTP] Private key format: Unknown");
+                }
+                if (keyStr.includes("ENCRYPTED")) {
+                    Extension.appendLineToOutputChannel("[INFO][SFTP] Private key is encrypted (passphrase required)");
+                }
+            }
+        } catch (err: any) {
+            Extension.appendLineToOutputChannel(
+                "[ERROR][SFTP] Can't read private key file: " + this.options.privateKey + ". Error: " + err.message
+            );
             Extension.showErrorMessage("[SFTP] Can't read private key file: " + this.options.privateKey);
             return;
         }
 
+        // Log authentication configuration
+        Extension.appendLineToOutputChannel("[INFO][SFTP] === Authentication Configuration ===");
+        Extension.appendLineToOutputChannel("[INFO][SFTP] Username: " + this.options.user);
+        Extension.appendLineToOutputChannel(
+            "[INFO][SFTP] Password provided: " + (this.options.password ? "Yes" : "No")
+        );
+        Extension.appendLineToOutputChannel("[INFO][SFTP] Private key provided: " + (privateKey ? "Yes" : "No"));
+        Extension.appendLineToOutputChannel(
+            "[INFO][SFTP] Passphrase provided: " + (this.options.passphrase ? "Yes" : "No")
+        );
         Extension.appendLineToOutputChannel(
             "[INFO][SFTP] Connecting to: " + this.options.host + ":" + this.options.port
         );
@@ -113,6 +181,7 @@ export class SFTP extends Target implements TargetInterface {
             password: this.options.password,
             privateKey: privateKey,
             passphrase: this.options.passphrase,
+            tryKeyboard: true, // Enable keyboard-interactive fallback
         });
     }
     upload(uri: vscode.Uri): Promise<vscode.Uri> {
