@@ -175,11 +175,20 @@ export class SFTP extends Target implements TargetInterface {
         Extension.appendLineToOutputChannel(
             "[INFO][SFTP] Connecting to: " + this.options.host + ":" + this.options.port
         );
+        if (!this.options.authAgentPath) {
+            this.options.authAgentPath = process.env.SSH_AUTH_SOCK || undefined;
+        }
         if (!this.options.useAuthAgent) {
             this.options.useAuthAgent = false;
         }
+        if(this.options.useAuthAgent && !this.options.authAgentPath) {
+            Extension.appendLineToOutputChannel(
+                "[WARN][SFTP] Auth agent is enabled but no auth agent path is set."
+            );
+            this.options.useAuthAgent = false;
+        }
         Extension.appendLineToOutputChannel(
-            "[INFO][SFTP] Auth agent: " + (this.options.useAuthAgent ? ("Enabled (" + this.options.authAgentPath || process.env.SSH_AUTH_SOCK + ")") : "Disabled")
+            "[INFO][SFTP] Auth agent: " + (this.options.useAuthAgent ? ("Enabled (" + this.options.authAgentPath + ")") : "Disabled")
         );
         this.client.connect({
             host: this.options.host,
@@ -189,7 +198,7 @@ export class SFTP extends Target implements TargetInterface {
             privateKey: privateKey,
             passphrase: this.options.passphrase,
             tryKeyboard: true, // Enable keyboard-interactive fallback
-            agent: this.options.useAuthAgent ? (this.options.authAgentPath || process.env.SSH_AUTH_SOCK) : undefined,
+            agent: this.options.useAuthAgent ? (this.options.authAgentPath) : undefined,
         });
     }
     upload(uri: vscode.Uri): Promise<vscode.Uri> {
